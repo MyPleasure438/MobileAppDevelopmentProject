@@ -295,20 +295,20 @@ class SecondPage extends StatelessWidget {
                     isItalic: true,
                   ),
                     const SizedBox(width: 10), // spacing
-                    Expanded( // ✅ allows the calendar to take remaining space
+                    Expanded( // allows the calendar to take remaining space
                       child: SimpleCalendar(
                         labelText: "Select a Date",
-                        fontSize: 15, // ✅ smaller so it fits in row
+                        fontSize: 15, // smaller so it fits in row
                         textFamily: "Times New Roman",
                         isBold: true,
                         isItalic: true,
                       ),
                     ),
                     const SizedBox(width: 10), //
-                    Expanded( // ✅ allows the calendar to take remaining space
+                    Expanded( // allows the calendar to take remaining space
                       child: SimpleCalendar(
                         labelText: "Select a Date",
-                        fontSize: 15, // ✅ smaller so it fits in row
+                        fontSize: 15, // smaller so it fits in row
                         textFamily: "Times New Roman",
                         isBold: true,
                         isItalic: true,
