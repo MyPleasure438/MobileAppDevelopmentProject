@@ -169,7 +169,65 @@ class _SimpleTextFieldState extends State<SimpleTextField> {
   }
 }
 
+class SimpleCalendar extends StatefulWidget {
+  const SimpleCalendar({super.key, required this.labelText, required this.fontSize, required this.textFamily, required this.isBold, required this.isItalic});
+  final String labelText;
+  final double fontSize;
+  final String textFamily;
+  final bool isBold;
+  final bool isItalic;
 
+
+  @override
+  State<SimpleCalendar> createState() => _SimpleCalendarState();
+}
+
+class _SimpleCalendarState extends State<SimpleCalendar> {
+  final textCtrl = TextEditingController();
+  DateTime? selectedDate;
+
+  @override
+  void dispose() {
+    textCtrl.dispose(); //
+    super.dispose();
+  }
+
+  @override
+
+  Widget build(BuildContext context) {
+    textCtrl.text = selectedDate == null
+        ? ''
+        : "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}";
+
+
+
+    return TextFormField(
+      readOnly: true, // prevent manual typing
+      decoration: InputDecoration(labelText: widget.labelText, labelStyle: TextStyle(
+          fontSize: widget.fontSize,
+          fontWeight: widget.isBold ? FontWeight.bold : FontWeight.normal,
+          fontStyle: widget.isItalic ? FontStyle.italic : FontStyle.normal,
+          fontFamily: widget.textFamily),
+        border: OutlineInputBorder(),
+      ),
+      controller: textCtrl,
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),       // default today
+          firstDate: DateTime(2000),         // earliest allowed
+          lastDate: DateTime(2100),          // latest allowed
+        );
+
+        if (pickedDate != null) {
+          setState(() {
+            selectedDate = pickedDate;
+          });
+        }
+      },
+    );
+  }
+}
 
 class MyFirstPage extends StatelessWidget {
   final textField1 = GlobalKey<_SimpleTextFieldState>();
@@ -195,7 +253,7 @@ class MyFirstPage extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SecondPage()),
+                MaterialPageRoute(builder: (context) =>  SecondPage()),
               );
             },
             child: const Text('Login'),
@@ -212,14 +270,65 @@ class MyFirstPage extends StatelessWidget {
 }
 
 class SecondPage extends StatelessWidget {
-  const SecondPage({super.key});
+  SecondPage({super.key});
+  final textFieldSecondPage1 = GlobalKey<_SimpleTextFieldState>();
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Second Page")),
-      body: const Center(
-        child: Text("Welcome to Page 2!"),
+      appBar: AppBar(title: const Text("Login Page")),
+      body: Column(
+        children: [
+          Padding(
+              padding: const EdgeInsets.only(top: 20),child: (
+              SimpleText(text: "Delivery Schedule View", fontSize: 25, textFamily: "Times New Roman", isBold: true, isItalic:  true))),
+
+          Padding(
+              padding: const EdgeInsets.only(top: 20, left: 16, right: 16),child: (
+                Row(
+                  children: [SimpleText(
+                    text: "View",
+                    fontSize: 15,
+                    textFamily: "Times New Roman",
+                    isBold: true,
+                    isItalic: true,
+                  ),
+                    const SizedBox(width: 10), // spacing
+                    Expanded( // ✅ allows the calendar to take remaining space
+                      child: SimpleCalendar(
+                        labelText: "Select a Date",
+                        fontSize: 15, // ✅ smaller so it fits in row
+                        textFamily: "Times New Roman",
+                        isBold: true,
+                        isItalic: true,
+                      ),
+                    ),
+                    const SizedBox(width: 10), //
+                    Expanded( // ✅ allows the calendar to take remaining space
+                      child: SimpleCalendar(
+                        labelText: "Select a Date",
+                        fontSize: 15, // ✅ smaller so it fits in row
+                        textFamily: "Times New Roman",
+                        isBold: true,
+                        isItalic: true,
+                      ),
+                    ),
+                  ],
+                )
+              )
+          ),
+
+          Padding(
+              padding: const EdgeInsets.only(top: 20, left: 16, right: 16),child: (
+              SimpleText(text: "Delivered by [insert date]", fontSize: 25, textFamily: "Times New Roman", isBold: true, isItalic:  true))),
+
+          Padding(
+              padding: const EdgeInsets.only(top: 20, left: 16, right: 16),child: (
+              SimpleText(text: "Pending", fontSize: 25, textFamily: "Times New Roman", isBold: true, isItalic:  true))),
+
+
+        ]
       ),
     );
   }
