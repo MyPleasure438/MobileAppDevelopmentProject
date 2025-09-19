@@ -1,3 +1,4 @@
+/*
 import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -71,7 +72,7 @@ class _UserWidgetState extends State<UserWidget> {
   void initState() {
     super.initState();
     // TODO - Get the c
-    //  urrent user
+    //  Current user
     _firestoreInstance = FirebaseFirestore.instance;
     var user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -93,3 +94,4 @@ class _UserWidgetState extends State<UserWidget> {
     );
   }
 }
+*/

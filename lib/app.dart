@@ -1,4 +1,4 @@
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import 'auth_gate.dart';
 
@@ -18,4 +18,3 @@ class MyApp extends StatelessWidget {
   }
 }
 
- */
