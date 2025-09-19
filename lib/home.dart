@@ -71,7 +71,7 @@ class _UserWidgetState extends State<UserWidget> {
   void initState() {
     super.initState();
     // TODO - Get the c
-    //  urrent user
+    //  current user
     _firestoreInstance = FirebaseFirestore.instance;
     var user = FirebaseAuth.instance.currentUser;
     if (user != null) {

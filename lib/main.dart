@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:practical_assignment_project/taskbar.dart';
 import 'firebase_options.dart';
 
 // Import your pages barrel file
+import 'widgets/widgets.dart';
 import 'pages/pages.dart';
 
 void main() async {
@@ -25,7 +27,8 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyFirstPage(), // Start at your login page
+      home: const Taskbar(), // Start at your login page
     );
   }
 }
+
