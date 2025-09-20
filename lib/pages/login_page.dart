@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:practical_assignment_project/taskbar.dart';
 import '../widgets/widgets.dart';
 import '../pages/pages.dart';
 
@@ -55,9 +56,9 @@ class MyFirstPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => SecondPage()),
+                MaterialPageRoute(builder: (context) => Taskbar()),
               );
             },
             child: const Text('Login'),

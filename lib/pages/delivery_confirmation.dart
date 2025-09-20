@@ -2,18 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:signature/signature.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class DeliveryApp extends StatelessWidget {
-  const DeliveryApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const DeliveryConfirmationScreen(),
-    );
-  }
-}
 
 class DeliveryConfirmationScreen extends StatefulWidget {
   const DeliveryConfirmationScreen({super.key});
@@ -41,7 +33,7 @@ class _DeliveryConfirmationScreenState extends State<DeliveryConfirmationScreen>
 
   Future<void> _pickImage() async {
     final XFile? pickedFile =
-    await _picker.pickImage(source: ImageSource.gallery); // or ImageSource.camera
+    await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
@@ -51,19 +43,53 @@ class _DeliveryConfirmationScreenState extends State<DeliveryConfirmationScreen>
   }
 
   Future<void> _submitDelivery() async {
-    // Example: Export signature as PNG
-    final signature = await _signatureController.toPngBytes();
+    if (_attachedImage == null || _signatureController.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please attach a photo and signature")),
+      );
+      return;
+    }
 
-    // You can now send:
-    // - signature (PNG bytes)
-    // - _attachedImage (File)
-    // - checkbox states
-    // to your backend or local storage
+    try {
+      // 1. Upload photo
+      final photoRef = FirebaseStorage.instance
+          .ref()
+          .child("deliveries/delivery001/photoUrl");
+      await photoRef.putFile(_attachedImage!);
+      final photoUrl = await photoRef.getDownloadURL();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Delivery confirmed! (Signature & image captured)")),
-    );
+      // 2. Upload signature
+      final sigBytes = await _signatureController.toPngBytes();
+      if (sigBytes == null) {
+        throw Exception("Signature export failed");
+      }
+      final sigRef = FirebaseStorage.instance
+          .ref()
+          .child("deliveries/delivery001/signatureUrl");
+      await sigRef.putData(sigBytes);
+      final sigUrl = await sigRef.getDownloadURL();
+
+      // 3. Save metadata to Firestore (only after URLs are ready)
+      await FirebaseFirestore.instance
+          .collection("deliveries")
+          .doc("delivery001")
+          .set({
+        "photoUrl": photoUrl,
+        "signatureUrl": sigUrl,
+        "status": "confirmed",
+      }, SetOptions(merge: true));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Delivery confirmed and uploaded ✅")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
   }
+
+
 
   @override
   void dispose() {
