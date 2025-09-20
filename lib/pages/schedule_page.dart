@@ -77,6 +77,35 @@ class SecondPage extends StatelessWidget {
               ),
             ),
           ),
+          Padding(
+            padding: EdgeInsets.only(top: 10, left: 0, right: 0),
+            child: Align(
+              alignment: Alignment.center,
+              child: OrderCard(
+                source: "Pandan Indah",
+                destination: "Jalan Jasmine",
+                deadline: "11:00AM",
+                onAssign: () {
+                  // 👉 This will run when the button is pressed
+                  print("Assigned order from Workshop Bay E.S. to Workshop Bay 69");
+
+                  // Example: navigate to another page
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => OrderDetailsPage()),
+                  // );
+
+                  // Example: update backend
+                  // FirebaseFirestore.instance.collection("orders").doc("123").update({
+                  //   "assigned": true,
+                },
+
+
+              ),
+            ),
+          )
+
+
         ],
       ),
     );
