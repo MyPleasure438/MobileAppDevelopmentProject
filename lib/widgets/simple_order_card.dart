@@ -21,23 +21,23 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Header text
-    String headerText = status == "pending"
+    String headerText = status == "Pending"
         ? "Pending"
-        : isAssignedToMe && status == "in_delivery"
+        : isAssignedToMe && status == "In_delivery"
         ? "Currently delivering"
         : "Delivery";
 
     // Button logic
-    bool showButton = status == "pending" || (status == "in_delivery" && isAssignedToMe);
+    bool showButton = status == "Pending" || (status == "In_delivery" && isAssignedToMe);
     String buttonText = "";
-    if (status == "pending") {
+    if (status == "Pending") {
       buttonText = "I'm delivering now!";
-    } else if (status == "in_delivery" && isAssignedToMe) {
+    } else if (status == "In_delivery" && isAssignedToMe) {
       buttonText = "Cancel delivery";
     }
 
     // Button color
-    Color buttonColor = status == "pending" ? Colors.orange : Colors.red;
+    Color buttonColor = status == "Pending" ? Colors.orange : Colors.red;
 
     return Card(
       shape: RoundedRectangleBorder(

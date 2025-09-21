@@ -8,6 +8,7 @@ class CurrentUser {
   late String name ;
   late String email ;
   late String phone ;
+  late String vehicle_no;
   late String role ;
   late String status ;
   bool profileComplete = false;
@@ -18,6 +19,7 @@ class CurrentUser {
     name = data['name'];
     email = data['email'];
     phone = data['phone'];
+    vehicle_no = data['Vehicle_no'];
     role = data['role'];
     status = data['status'];
     profileComplete = data['profileComplete'] ?? false;

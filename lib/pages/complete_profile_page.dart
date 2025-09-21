@@ -16,6 +16,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _vehicleController =  TextEditingController();
 
   Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
@@ -24,6 +25,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           .update({
         "name": _nameController.text,
         "phone": _phoneController.text,
+        "Vehicle_no":_vehicleController.text,
         "profileComplete": true, //  Mark as complete
       });
 
@@ -57,6 +59,12 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                 decoration: const InputDecoration(labelText: "Phone Number"),
                 validator: (value) =>
                 value == null || value.isEmpty ? "Enter your phone number" : null,
+              ),
+              TextFormField(
+                controller: _vehicleController,
+                decoration: const InputDecoration(labelText: "Vehicle Number"),
+                validator: (value) =>
+                value == null || value.isEmpty ? "Enter your vehicle number" : null,
               ),
               const SizedBox(height: 20),
               ElevatedButton(

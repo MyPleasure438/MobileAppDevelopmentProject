@@ -82,9 +82,9 @@ class DeliveryUpdatePage extends StatelessWidget {
                         Text(
                           "Status: ${data["status"] ?? "Pending"}",
                           style: TextStyle(
-                            color: (data["status"] == "On-delivery")
-                                ? Colors.green
-                                : Colors.yellow,
+                            color: (data["status"] == "In_delivery")
+                                ? Colors.orange
+                                : Colors.green,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

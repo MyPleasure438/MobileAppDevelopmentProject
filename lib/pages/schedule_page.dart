@@ -87,14 +87,14 @@ class _SecondPageState extends State<SecondPage> {
                 // Filter: pending without driver OR in_delivery assigned to current user
                 final visibleDocs = docs.where((doc) {
                   final data = doc.data() as Map<String, dynamic>;
-                  final status = data["status"] ?? "pending";
+                  final status = data["status"] ?? "Pending";
                   final assignedDriver = data["assignedDriverID"];
 
-                  return (status == "pending" &&
+                  return (status == "Pending" &&
                       (assignedDriver == null ||
                           assignedDriver == "null" ||
                           assignedDriver == "")) ||
-                      (status == "in_delivery" &&
+                      (status == "In_delivery" &&
                           assignedDriver == currentUser);
                 }).toList();
 
@@ -110,7 +110,7 @@ class _SecondPageState extends State<SecondPage> {
                     final data =
                     visibleDocs[index].data() as Map<String, dynamic>;
                     final assignedDriver = data["assignedDriverID"];
-                    final status = data["status"] ?? "pending";
+                    final status = data["status"] ?? "Pending";
                     final deliveredAtUtc = (data["deliveredAt"] as Timestamp).toDate().toUtc();
                     final deliveredAtMalaysia = deliveredAtUtc.add(const Duration(hours: 8));
                     final deadline = DateFormat("dd/MM/yyyy HH:mm").format(deliveredAtMalaysia);
@@ -123,7 +123,7 @@ class _SecondPageState extends State<SecondPage> {
                       status: status,
                       isAssignedToMe: assignedDriver == currentUser,
                       onAssign: () async {
-                        if (status == "pending") {
+                        if (status == "Pending") {
                           // Claim delivery
                           final confirm = await showDialog<bool>(
                             context: context,
@@ -149,11 +149,11 @@ class _SecondPageState extends State<SecondPage> {
                                 .collection("deliveries")
                                 .doc(visibleDocs[index].id)
                                 .update({
-                              "status": "in_delivery",
+                              "status": "In_delivery",
                               "assignedDriverID": currentUser,
                             });
                           }
-                        } else if (status == "in_delivery" && assignedDriver == currentUser) {
+                        } else if (status == "In_delivery" && assignedDriver == currentUser) {
                           // Cancel delivery
                           final confirm = await showDialog<bool>(
                             context: context,
@@ -179,7 +179,7 @@ class _SecondPageState extends State<SecondPage> {
                                 .collection("deliveries")
                                 .doc(visibleDocs[index].id)
                                 .update({
-                              "status": "pending",
+                              "status": "Pending",
                               "assignedDriverID": "null", // or null if your logic accepts it
                             });
                           }

@@ -53,6 +53,16 @@ class _EditDeliveryPageState extends State<EditDeliveryPage> {
         const SnackBar(content: Text("Saved successfully")),
       );
       Navigator.pop(context, true);
+
+      if (updatedStatus == "Pending") {
+        await FirebaseFirestore.instance
+            .collection("deliveries")
+            .doc(widget.deliveryId)
+            .update({
+          "status": "Pending",
+          "assignedDriverID": "null", // or null if your logic accepts it
+        });
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

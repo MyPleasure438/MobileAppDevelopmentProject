@@ -66,7 +66,7 @@ class _DeliveryConfirmationScreenState
           .collection("deliveries")
           .doc(widget.deliveryId)
           .set({
-        "status": "confirmed",
+        "status": "Confirmed",
       }, SetOptions(merge: true));
 
       ScaffoldMessenger.of(context).showSnackBar(
