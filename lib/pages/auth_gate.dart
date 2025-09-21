@@ -110,7 +110,7 @@ class AuthGate extends StatelessWidget {
 
             // Route based on role
             if (role == 'driver') {
-              return MyFirstPage(); // Replace with DriverPage if you make one
+              return SecondPage(); // Replace with DriverPage if you make one
             } else if (role == 'admin') {
               return const Scaffold(
                 body: Center(child: Text("Admin Page Placeholder")),
