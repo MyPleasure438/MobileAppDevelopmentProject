@@ -1,6 +1,6 @@
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import 'auth_gate.dart';
+import 'pages/auth_gate.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -18,4 +18,3 @@ class MyApp extends StatelessWidget {
   }
 }
 
- */
