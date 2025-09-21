@@ -52,10 +52,11 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
       ),
       controller: textCtrl,
       onTap: () async {
+        DateTime now = DateTime.now(); // 🔹 define now
         DateTime? pickedDate = await showDatePicker(
           context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2000),
+          initialDate: now,
+          firstDate: now, // prevents past dates
           lastDate: DateTime(2100),
         );
 
@@ -67,6 +68,7 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
           widget.onDateSelected(pickedDate); // 🔹 pass back up
         }
       },
+
     );
   }
 }

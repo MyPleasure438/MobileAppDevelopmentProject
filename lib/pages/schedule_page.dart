@@ -207,6 +207,7 @@ class _SecondPageState extends State<SecondPage> {
     final startOfDayUtc = startOfDayLocal.subtract(const Duration(hours: 8));
     final endOfDayUtc = endOfDayLocal.subtract(const Duration(hours: 8));
 
+
     print("Querying UTC: $startOfDayUtc to $endOfDayUtc");
 
     return FirebaseFirestore.instance
