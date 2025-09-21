@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "308235159417",
+    "project_id": "parts-delivery-project",
+    "storage_bucket": "parts-delivery-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308235159417:android:a65395059542f9826bd1a8",
+        "android_client_info": {
+          "package_name": "com.example.practical_assignment_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgDSlmohggtUT-U7_PtrHIOSVnoHlcDHY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -12,7 +12,7 @@ class EditDeliveryPage extends StatefulWidget {
 
 class _EditDeliveryPageState extends State<EditDeliveryPage> {
   final List<String> statusOptions = [
-    "On-Delivery",
+    "in_delivery",
     "Delivered",
     "Pending",
     "Delayed",

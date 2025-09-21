@@ -41,14 +41,13 @@ class _TaskbarState extends State<Taskbar> {
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.black,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.directions_car), label: "Deliveries"),
-          BottomNavigationBarItem(icon: Icon(Icons.work), label: "Requests"),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt), label: "Confirm"),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: "Schedule"),
+          BottomNavigationBarItem(icon: Icon(Icons.directions_car), label: "Request"),
+          BottomNavigationBarItem(icon: Icon(Icons.work), label: "Update"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
     );
   }
 }
 
- */
