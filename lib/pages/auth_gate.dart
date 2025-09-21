@@ -2,6 +2,7 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:practical_assignment_project/taskbar.dart';
 import '../main.dart';
 import 'pages.dart'; // <-- you can add DriverPage, UserPage, etc.
 import '../database/current_user.dart';
@@ -110,7 +111,7 @@ class AuthGate extends StatelessWidget {
 
             // Route based on role
             if (role == 'driver') {
-              return SecondPage(); // Replace with DriverPage if you make one
+              return Taskbar(); // Replace with DriverPage if you make one
             } else if (role == 'admin') {
               return const Scaffold(
                 body: Center(child: Text("Admin Page Placeholder")),
