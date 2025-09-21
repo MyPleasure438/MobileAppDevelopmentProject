@@ -11,7 +11,6 @@ class ItemDetailsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Item Details"),
-        backgroundColor: Colors.blue,
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance

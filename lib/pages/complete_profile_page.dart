@@ -57,14 +57,32 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
               TextFormField(
                 controller: _phoneController,
                 decoration: const InputDecoration(labelText: "Phone Number"),
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter your phone number" : null,
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Enter your phone number";
+                  }
+                  final phoneRegex = RegExp(r'^(01)[0-9]{8,9}$');
+                  if (!phoneRegex.hasMatch(value)) {
+                    return "Enter a valid Malaysia phone number (e.g. 0123456789)";
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 controller: _vehicleController,
                 decoration: const InputDecoration(labelText: "Vehicle Number"),
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter your vehicle number" : null,
+                textCapitalization: TextCapitalization.characters,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Enter your vehicle number";
+                  }
+                  final vehicleRegex = RegExp(r'^[A-Z]{1,3}\s?[0-9]{1,4}[A-Z]?$');
+                  if (!vehicleRegex.hasMatch(value.toUpperCase())) {
+                    return "Enter a valid Malaysia vehicle number (e.g. WXX1234A)";
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 20),
               ElevatedButton(

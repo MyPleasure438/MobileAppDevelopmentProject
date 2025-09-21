@@ -23,7 +23,7 @@ class DeliveryRequestPage extends StatelessWidget {
         stream: FirebaseFirestore.instance
             .collection("deliveries")
             .where("assignedDriverID", isEqualTo: userId)
-            .where("status", isEqualTo: "in_delivery")
+            .where("status", isEqualTo: "In_delivery")
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
