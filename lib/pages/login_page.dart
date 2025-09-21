@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:practical_assignment_project/taskbar.dart';
 import '../widgets/widgets.dart';
 import '../pages/pages.dart';
-
+import '../database/current_user.dart';
 class MyFirstPage extends StatelessWidget {
   MyFirstPage({super.key});
 
@@ -20,10 +20,10 @@ class MyFirstPage extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const Padding(
+           Padding(
             padding: EdgeInsets.only(top: 20),
             child: SimpleText(
-              text: "Login Page",
+              text: CurrentUser().userID ?? "Guest",
               fontSize: 25,
               textFamily: "Times New Roman",
               isBold: true,

@@ -24,7 +24,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           .update({
         "name": _nameController.text,
         "phone": _phoneController.text,
-        "profileComplete": true, // 🚨 Mark as complete
+        "profileComplete": true, //  Mark as complete
       });
 
       // After saving → go back to AuthGate, it will route properly
