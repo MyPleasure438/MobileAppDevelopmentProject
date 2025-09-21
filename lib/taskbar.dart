@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:practical_assignment_project/pages/delivery_request_page.dart';
+import 'package:practical_assignment_project/pages/delivery_status_update.dart';
 import 'database/current_user.dart';
 import 'pages/pages.dart';
 
@@ -22,9 +23,9 @@ class _TaskbarState extends State<Taskbar> {
     super.initState();
     _pages = [
       SecondPage(), // your delivery schedule view
-      DeliveryListPage(),
       DeliveryRequestPage(userId: userId),
-      DeliveryConfirmationScreen(deliveryId: 'delivery001'),
+      DeliveryUpdatePage(userId: userId),
+      //ProfilePage(userId: userId),
     ];
   }
 
