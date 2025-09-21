@@ -9,6 +9,7 @@ import 'pages/pages.dart';
 import 'pages/insert_data.dart';
 import 'pages/auth_gate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'database/current_user.dart';
 
 
 void main() async {
