@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+
 class OrderCard extends StatelessWidget {
   final String source;
   final String destination;
   final String deadline;
   final String status;
-  final String? assignedDriverID;
-  final String? currentUserID;
+  final bool isAssignedToMe;
   final VoidCallback onAssign;
 
   const OrderCard({
@@ -14,58 +14,37 @@ class OrderCard extends StatelessWidget {
     required this.destination,
     required this.deadline,
     required this.status,
-    required this.assignedDriverID,
-    required this.currentUserID,
+    required this.isAssignedToMe,
     required this.onAssign,
   });
 
   @override
   Widget build(BuildContext context) {
     // Header text
-    String headerText;
-    if (status == "pending") {
-      headerText = "Pending";
-    } else if (assignedDriverID == currentUserID && status == "assigned") {
-      headerText = "Assigned to me";
-    } else if (assignedDriverID == currentUserID && status == "in_delivery") {
-      headerText = "Currently delivering";
-    } else {
-      headerText = "Assigned to another driver";
-    }
+    String headerText = status == "pending"
+        ? "Pending"
+        : isAssignedToMe && status == "in_delivery"
+        ? "Currently delivering"
+        : "Delivery";
 
     // Button logic
-    bool showButton = false;
+    bool showButton = status == "pending" || (status == "in_delivery" && isAssignedToMe);
     String buttonText = "";
-
-    final isAssigned = assignedDriverID != null && assignedDriverID != "null";
-
-    if (!isAssigned && status == "pending") {
-      showButton = true;
-      buttonText = "Assign to me!";
-    } else if (assignedDriverID == currentUserID && status == "assigned") {
-      showButton = true;
-      buttonText = "I’m delivering now!";
-    } else if (assignedDriverID == currentUserID && status == "in_delivery") {
-      showButton = true;
+    if (status == "pending") {
+      buttonText = "I'm delivering now!";
+    } else if (status == "in_delivery" && isAssignedToMe) {
       buttonText = "Cancel delivery";
     }
 
-
-    // Border color
-    Color borderColor = Colors.grey;
-    if (assignedDriverID == currentUserID && status == "assigned") {
-      borderColor = Colors.red;
-    } else if (assignedDriverID == currentUserID && status == "in_delivery") {
-      borderColor = Colors.orange;
-    }
-
     // Button color
-    Color buttonColor = Colors.orange;
-    if (buttonText == "Cancel delivery") buttonColor = Colors.red;
+    Color buttonColor = status == "pending" ? Colors.orange : Colors.red;
 
     return Card(
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: borderColor, width: 3),
+        side: BorderSide(
+          color: isAssignedToMe ? Colors.orange : Colors.red,
+          width: 3,
+        ),
         borderRadius: BorderRadius.circular(8),
       ),
       margin: const EdgeInsets.all(10),
