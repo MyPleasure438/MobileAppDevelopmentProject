@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-
 class OrderCard extends StatelessWidget {
   final String source;
   final String destination;
   final String deadline;
-  final String status; //  delivery status
-  final bool isAssignedToMe; //  checks whether this driver owns it
+  final String status;
+  final String? assignedDriverID;
+  final String? currentUserID;
   final VoidCallback onAssign;
 
   const OrderCard({
@@ -14,51 +14,58 @@ class OrderCard extends StatelessWidget {
     required this.destination,
     required this.deadline,
     required this.status,
-    required this.isAssignedToMe,
+    required this.assignedDriverID,
+    required this.currentUserID,
     required this.onAssign,
   });
 
   @override
   Widget build(BuildContext context) {
-    //  Decide header text
+    // Header text
     String headerText;
     if (status == "pending") {
       headerText = "Pending";
-    } else if (isAssignedToMe && status == "assigned") {
+    } else if (assignedDriverID == currentUserID && status == "assigned") {
       headerText = "Assigned to me";
-    } else if (isAssignedToMe && status == "in_delivery") {
+    } else if (assignedDriverID == currentUserID && status == "in_delivery") {
       headerText = "Currently delivering";
     } else {
       headerText = "Assigned to another driver";
     }
 
-    //  Decide button label
+    // Button logic
+    bool showButton = false;
     String buttonText = "";
-    if (isAssignedToMe && status == "assigned") {
+
+    final isAssigned = assignedDriverID != null && assignedDriverID != "null";
+
+    if (!isAssigned && status == "pending") {
+      showButton = true;
+      buttonText = "Assign to me!";
+    } else if (assignedDriverID == currentUserID && status == "assigned") {
+      showButton = true;
       buttonText = "I’m delivering now!";
-    } else if (isAssignedToMe && status == "in_delivery") {
+    } else if (assignedDriverID == currentUserID && status == "in_delivery") {
+      showButton = true;
       buttonText = "Cancel delivery";
     }
 
-    bool showButton = buttonText.isNotEmpty;
 
-    // Border color logic
+    // Border color
     Color borderColor = Colors.grey;
-    if (isAssignedToMe && status == "assigned") {
-      borderColor = Colors.red; // red if assigned to me
-    } else if (isAssignedToMe && status == "in_delivery") {
-      borderColor = Colors.orange; // orange if currently delivering
+    if (assignedDriverID == currentUserID && status == "assigned") {
+      borderColor = Colors.red;
+    } else if (assignedDriverID == currentUserID && status == "in_delivery") {
+      borderColor = Colors.orange;
     }
 
-    // Button color logic
+    // Button color
     Color buttonColor = Colors.orange;
-    if (buttonText == "Cancel delivery") {
-      buttonColor = Colors.red; // cancel button is red
-    }
+    if (buttonText == "Cancel delivery") buttonColor = Colors.red;
 
     return Card(
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: borderColor, width: 3), //  dynamic border
+        side: BorderSide(color: borderColor, width: 3),
         borderRadius: BorderRadius.circular(8),
       ),
       margin: const EdgeInsets.all(10),
@@ -67,7 +74,6 @@ class OrderCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 🔹 Header
             Text(
               headerText,
               style: const TextStyle(
@@ -75,10 +81,7 @@ class OrderCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 12),
-
-            // 🔹 Pickup/Dropoff
             Text(
               "From: $source",
               style: const TextStyle(fontSize: 16),
@@ -90,10 +93,7 @@ class OrderCard extends StatelessWidget {
               style: const TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
-
             const SizedBox(height: 12),
-
-            // 🔹 Deadline
             Text(
               "Deadline: $deadline",
               style: const TextStyle(
@@ -102,10 +102,7 @@ class OrderCard extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-
             const SizedBox(height: 12),
-
-            // 🔹 Action button
             if (showButton)
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
