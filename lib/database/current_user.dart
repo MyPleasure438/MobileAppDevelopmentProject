@@ -3,13 +3,13 @@ class CurrentUser {
   factory CurrentUser() => _instance;
   CurrentUser._internal();
 
-  String? uid;
-  String? userID;
-  String? name;
-  String? email;
-  String? phone;
-  String? role;
-  String? status;
+  late String uid;
+  late String userID ;
+  late String name ;
+  late String email ;
+  late String phone ;
+  late String role ;
+  late String status ;
   bool profileComplete = false;
 
   void setFromMap(Map<String, dynamic> data, String uid) {

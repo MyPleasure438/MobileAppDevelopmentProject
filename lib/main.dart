@@ -6,9 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 // Import your pages barrel file
 //import 'widgets/widgets.dart';
 import 'pages/pages.dart';
-import 'pages/insert_data.dart';
 import 'pages/auth_gate.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 void main() async {

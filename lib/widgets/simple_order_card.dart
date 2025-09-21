@@ -6,7 +6,7 @@ class OrderCard extends StatelessWidget {
   final String deadline;
   final VoidCallback onAssign;
 
-  OrderCard({
+  const OrderCard({
     super.key,
     required this.source,
     required this.destination,
