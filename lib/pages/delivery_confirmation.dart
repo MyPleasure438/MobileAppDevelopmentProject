@@ -3,24 +3,22 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:signature/signature.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:intl/intl.dart';
 
 class DeliveryConfirmationScreen extends StatefulWidget {
-  const DeliveryConfirmationScreen({super.key});
+  final String deliveryId; // pass the deliveryId when navigating
+
+
+  const DeliveryConfirmationScreen({super.key, required this.deliveryId});
 
   @override
-  State<DeliveryConfirmationScreen> createState() => _DeliveryConfirmationScreenState();
+  State<DeliveryConfirmationScreen> createState() =>
+      _DeliveryConfirmationScreenState();
 }
 
-class _DeliveryConfirmationScreenState extends State<DeliveryConfirmationScreen> {
-  // checkboxes
-  bool torqueMaster = false;
-  bool flexiDrive = false;
-  bool hydroCore = false;
-
+class _DeliveryConfirmationScreenState
+    extends State<DeliveryConfirmationScreen> {
   // image file
   File? _attachedImage;
   final ImagePicker _picker = ImagePicker();
@@ -31,6 +29,7 @@ class _DeliveryConfirmationScreenState extends State<DeliveryConfirmationScreen>
     penColor: Colors.black,
     exportBackgroundColor: Colors.white,
   );
+
 
   Future<void> _pickImage() async {
     final XFile? pickedFile =
@@ -43,7 +42,7 @@ class _DeliveryConfirmationScreenState extends State<DeliveryConfirmationScreen>
     }
   }
 
-  Future<void> _submitDelivery() async {
+  Future<void> _submitDelivery(Map<String, dynamic> deliveryData) async {
     if (_attachedImage == null || _signatureController.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please attach a photo and signature")),
@@ -51,37 +50,28 @@ class _DeliveryConfirmationScreenState extends State<DeliveryConfirmationScreen>
       return;
     }
 
+    // Check if all items are delivered
+    List items = deliveryData["items"] ?? [];
+    bool allDelivered =
+    items.every((item) => item["delivered"] == true);
+
+    if (!allDelivered) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please confirm all items delivered")),
+      );
+      return;
+    }
+
     try {
-      // 1. Upload photo
-      final photoRef = FirebaseStorage.instance
-          .ref()
-          .child("deliveries/delivery001/photoUrl");
-      await photoRef.putFile(_attachedImage!);
-      final photoUrl = await photoRef.getDownloadURL();
-
-      // 2. Upload signature
-      final sigBytes = await _signatureController.toPngBytes();
-      if (sigBytes == null) {
-        throw Exception("Signature export failed");
-      }
-      final sigRef = FirebaseStorage.instance
-          .ref()
-          .child("deliveries/delivery001/signatureUrl");
-      await sigRef.putData(sigBytes);
-      final sigUrl = await sigRef.getDownloadURL();
-
-      // 3. Save metadata to Firestore (only after URLs are ready)
       await FirebaseFirestore.instance
           .collection("deliveries")
-          .doc("delivery001")
+          .doc(widget.deliveryId)
           .set({
-        "photoUrl": photoUrl,
-        "signatureUrl": sigUrl,
         "status": "confirmed",
       }, SetOptions(merge: true));
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Delivery confirmed and uploaded ✅")),
+        const SnackBar(content: Text("Delivery confirmed ")),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -89,8 +79,6 @@ class _DeliveryConfirmationScreenState extends State<DeliveryConfirmationScreen>
       );
     }
   }
-
-
 
   @override
   void dispose() {
@@ -105,172 +93,192 @@ class _DeliveryConfirmationScreenState extends State<DeliveryConfirmationScreen>
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // Go back to previous screen
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          "Delivery Confirmation",
-          style: TextStyle(color: Colors.black),
-        ),
+        title: const Text("Delivery Confirmation",
+            style: TextStyle(color: Colors.black)),
         centerTitle: true,
         actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              backgroundColor: Colors.blueAccent,
-              child: Icon(Icons.person, color: Colors.white),
-            ),
-          )
+
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Order details card
-            Card(
-              color: Colors.grey[200],
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text("Order ID: ORD_1234", style: TextStyle(fontWeight: FontWeight.bold)),
-                    SizedBox(height: 4),
-                    Text("Pick Up: Workshop Bay E.S"),
-                    Text("Destination: Workshop Bay 69"),
-                    Text("Requested by : John"),
-                    Text("Required By: 2025/07/08, 10:30AM"),
-                    SizedBox(height: 4),
-                    Text("Status: Incomplete",
-                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("deliveries")
+            .doc(widget.deliveryId)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            // Item Table
-            Table(
-              border: TableBorder.all(color: Colors.black),
-              columnWidths: const {
-                0: FlexColumnWidth(1),
-                1: FlexColumnWidth(3),
-                2: FlexColumnWidth(2),
-              },
+          var data = snapshot.data!.data() as Map<String, dynamic>;
+          List items = data["items"] ?? [];
+          Timestamp ts = data["deliveredAt"];
+          DateTime dt = ts.toDate();
+
+          // Format: 2025/07/08, 10:30 AM
+          String formatted = DateFormat('yyyy/MM/dd, hh:mm a').format(dt);
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // header row
-                TableRow(
-                  decoration: BoxDecoration(color: Colors.grey[300]),
-                  children: const [
-                    Padding(padding: EdgeInsets.all(8), child: Text("Qty", style: TextStyle(fontWeight: FontWeight.bold))),
-                    Padding(padding: EdgeInsets.all(8), child: Text("Item Name", style: TextStyle(fontWeight: FontWeight.bold))),
-                    Padding(padding: EdgeInsets.all(8), child: Text("Confirm Delivery", style: TextStyle(fontWeight: FontWeight.bold))),
-                  ],
-                ),
-                // item rows
-                TableRow(
-                  children: [
-                    const Padding(padding: EdgeInsets.all(8), child: Text("1")),
-                    const Padding(padding: EdgeInsets.all(8), child: Text("TorqueMaster 9000")),
-                    Checkbox(
-                      value: torqueMaster,
-                      onChanged: (val) => setState(() => torqueMaster = val ?? false),
+                // Order details card
+                Card(
+                  color: Colors.grey[200],
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Order ID: ${widget.deliveryId}",
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text("Pick Up: ${data["pickupAddress"] ?? "-"}"),
+                        Text("Destination: ${data["dropoffAddress"] ?? "-"}"),
+                        Text("Requested by: ${data["partRequesterName"] ?? "-"}"),
+                        Text("Delivered By:$formatted" ?? "-"),
+                        const SizedBox(height: 4),
+                        Text("Status: ${data["status"] ?? "Pending"}",),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-                TableRow(
+
+                const SizedBox(height: 16),
+
+                // Dynamic Item Table
+                Table(
+                  border: TableBorder.all(color: Colors.black),
+                  columnWidths: const {
+                    0: FlexColumnWidth(1),
+                    1: FlexColumnWidth(3),
+                    2: FlexColumnWidth(2),
+                  },
                   children: [
-                    const Padding(padding: EdgeInsets.all(8), child: Text("1")),
-                    const Padding(padding: EdgeInsets.all(8), child: Text("FlexiDrive Shaft")),
-                    Checkbox(
-                      value: flexiDrive,
-                      onChanged: (val) => setState(() => flexiDrive = val ?? false),
+                    // Header
+                    TableRow(
+                      decoration: BoxDecoration(color: Colors.grey[300]),
+                      children: const [
+                        Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text("Qty",
+                                style:
+                                TextStyle(fontWeight: FontWeight.bold))),
+                        Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text("Item Name",
+                                style:
+                                TextStyle(fontWeight: FontWeight.bold))),
+                        Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text("Confirm Delivery",
+                                style:
+                                TextStyle(fontWeight: FontWeight.bold))),
+                      ],
                     ),
+                    // Dynamic rows
+                    ...items.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      var item = entry.value;
+
+                      return TableRow(
+                        children: [
+                          Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Text(item["qty"].toString())),
+                          Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Text(item["name"])),
+                          Checkbox(
+                            value: item["delivered"] ?? false,
+                            onChanged: (val) async {
+                              items[index]["delivered"] = val ?? false;
+                              await FirebaseFirestore.instance
+                                  .collection("deliveries")
+                                  .doc(widget.deliveryId)
+                                  .update({"items": items});
+                            },
+                          ),
+                        ],
+                      );
+                    })
                   ],
                 ),
-                TableRow(
-                  children: [
-                    const Padding(padding: EdgeInsets.all(8), child: Text("2")),
-                    const Padding(padding: EdgeInsets.all(8), child: Text("HydroCorePiston")),
-                    Checkbox(
-                      value: hydroCore,
-                      onChanged: (val) => setState(() => hydroCore = val ?? false),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-            // Photo placeholder (shows selected image if available)
-            Container(
-              height: 150,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: _attachedImage == null
-                  ? const Center(
-                child: Icon(Icons.image, size: 60, color: Colors.grey),
-              )
-                  : Image.file(_attachedImage!, fit: BoxFit.cover),
-            ),
-            const SizedBox(height: 8),
-
-            // Attach photo
-            TextButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.add_box_outlined),
-              label: const Text("Attach Photo"),
-            ),
-            const SizedBox(height: 16),
-
-            // Signature pad
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Signature:", style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
+                // Photo
                 Container(
                   height: 150,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Signature(
-                    controller: _signatureController,
-                    backgroundColor: Colors.white,
-                  ),
+                  child: _attachedImage == null
+                      ? const Center(
+                    child: Icon(Icons.image,
+                        size: 60, color: Colors.grey),
+                  )
+                      : Image.file(_attachedImage!, fit: BoxFit.cover),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                const SizedBox(height: 8),
+
+                TextButton.icon(
+                  onPressed: _pickImage,
+                  icon: const Icon(Icons.add_box_outlined),
+                  label: const Text("Attach Photo"),
+                ),
+                const SizedBox(height: 16),
+
+                // Signature
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextButton(
-                      onPressed: () => _signatureController.clear(),
-                      child: const Text("Clear Signature"),
+                    const Text("Signature:",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 150,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                      ),
+                      child: Signature(
+                        controller: _signatureController,
+                        backgroundColor: Colors.white,
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => _signatureController.clear(),
+                          child: const Text("Clear Signature"),
+                        ),
+                      ],
                     ),
                   ],
                 ),
+                const SizedBox(height: 20),
+
+                // Confirm button
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  onPressed: () => _submitDelivery(data),
+                  child: const Text("Confirm Delivery",
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
               ],
             ),
-            const SizedBox(height: 20),
-
-            // Confirm button
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              onPressed: _submitDelivery,
-              child: const Text("Confirm Delivery", style: TextStyle(color: Colors.white, fontSize: 16)),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
